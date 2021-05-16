@@ -1,0 +1,55 @@
+Windows Registry Editor Version 5.00
+
+; codepage chinese
+
+[HKEY_CLASSES_ROOT\MIME\Database\Codepage\936]
+"BodyCharset"="gb2312"
+"Description"="@%SystemRoot%\\system32\\mlang.dll,-4648"
+"FixedWidthFont"="Simsun"
+"Level"=hex:07,07,00,00
+"ProportionalFont"="Simsun"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\MIME\Database\Codepage\936]
+"BodyCharset"="gb2312"
+"Description"="@%SystemRoot%\\system32\\mlang.dll,-4648"
+"FixedWidthFont"="Simsun"
+"Level"=hex:07,07,00,00
+"ProportionalFont"="Simsun"
+
+; GUIFont
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\GRE_Initialize]
+"DisableRemoteFontBootCache"=dword:00000000
+"ServicingStackModifiedFonts"=dword:00000002
+"GUIFont.Facename"="Microsoft YaHei UI"
+"GUIFont.Height"=dword:00000009
+"GUIFont.CharSet"=dword:00000086
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows NT\CurrentVersion\GRE_Initialize]
+"DisableRemoteFontBootCache"=dword:00000000
+"ServicingStackModifiedFonts"=dword:00000002
+"GUIFont.Facename"="Microsoft YaHei UI"
+"GUIFont.Height"=dword:00000009
+"GUIFont.CharSet"=dword:00000086
+
+; Associated DefaultFonts
+[HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FontAssoc\Associated DefaultFonts]
+"AssocSystemFont"="msyh.ttc"
+"FontPackage"="Î¢ÈíÑÅºÚ"
+"FontPackageDontCare"="Î¢ÈíÑÅºÚ"
+"FontPackageRoman"="Î¢ÈíÑÅºÚ"
+"FontPackageSwiss"="Î¢ÈíÑÅºÚ"
+"FontPackageModern"="Î¢ÈíÑÅºÚ"
+"FontPackageScript"="Î¢ÈíÑÅºÚ"
+"FontPackageDecorative"="Î¢ÈíÑÅºÚ"
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FontAssoc\Associated DefaultFonts]
+"AssocSystemFont"="msyh.ttc"
+"FontPackage"="Î¢ÈíÑÅºÚ"
+"FontPackageDontCare"="Î¢ÈíÑÅºÚ"
+"FontPackageRoman"="Î¢ÈíÑÅºÚ"
+"FontPackageSwiss"="Î¢ÈíÑÅºÚ"
+"FontPackageModern"="Î¢ÈíÑÅºÚ"
+"FontPackageScript"="Î¢ÈíÑÅºÚ"
+"FontPackageDecorative"="Î¢ÈíÑÅºÚ"
+

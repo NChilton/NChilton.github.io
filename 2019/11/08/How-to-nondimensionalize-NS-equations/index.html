@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"nchilton.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="许多物理问题，比如风刮过山脉、船在海上行驶等，    NS 方程NS 方程由质量守恒和动量守恒定理推导而来，质量守恒可表示为： $$\frac{\partial \rho}{\partial t}+\nabla\cdot(\rho\mathbf{u})&#x3D;0,$$其中 $\rho$ 为流体密度，$\mathbf{u}$ 为速度矢量。动量守恒可表示为：$$\underbrace{\rho\left">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NS 方程的无量纲化">
+<meta property="og:url" content="https://nchilton.github.io/2019/11/08/How-to-nondimensionalize-NS-equations/index.html">
+<meta property="og:site_name" content="李杜醉酒">
+<meta property="og:description" content="许多物理问题，比如风刮过山脉、船在海上行驶等，    NS 方程NS 方程由质量守恒和动量守恒定理推导而来，质量守恒可表示为： $$\frac{\partial \rho}{\partial t}+\nabla\cdot(\rho\mathbf{u})&#x3D;0,$$其中 $\rho$ 为流体密度，$\mathbf{u}$ 为速度矢量。动量守恒可表示为：$$\underbrace{\rho\left">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-11-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-02-21T16:00:00.000Z">
+<meta property="article:author" content="Chilton">
+<meta property="article:tag" content="Gerris">
+<meta property="article:tag" content="Navier-Stokes equations">
+<meta property="article:tag" content="Fluid dynamics">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://nchilton.github.io/2019/11/08/How-to-nondimensionalize-NS-equations/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>NS 方程的无量纲化 | 李杜醉酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">李杜醉酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">博客</p>
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">32</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">33</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://nchilton.github.io/2019/11/08/How-to-nondimensionalize-NS-equations/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chilton">
+      <meta itemprop="description" content="好好学习，天天向上">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李杜醉酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NS 方程的无量纲化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-08 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-08T00:00:00+08:00">2019-11-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-22 00:00:00" itemprop="dateModified" datetime="2020-02-22T00:00:00+08:00">2020-02-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Research/" itemprop="url" rel="index">
+                    <span itemprop="name">Research</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p> 许多物理问题，比如风刮过山脉、船在海上行驶等，</p>
+</blockquote>
+<!---more--->
+
+<h2 id="NS-方程"><a href="#NS-方程" class="headerlink" title="NS 方程"></a>NS 方程</h2><p>NS 方程由质量守恒和动量守恒定理推导而来，质量守恒可表示为：</p>
+<p>$$<br>\frac{\partial \rho}{\partial t}+\nabla\cdot(\rho\mathbf{u})=0,<br>$$<br>其中 $\rho$ 为流体密度，$\mathbf{u}$ 为速度矢量。动量守恒可表示为：<br>$$<br>\underbrace{\rho\left(\frac{\partial \mathbf{u}}{\partial t}+\mathbf{u} \cdot \nabla \mathbf{u}\right)}<em>{惯性力}=\underbrace{-\nabla p}</em>{压力}+\underbrace{\nabla \cdot\boldsymbol\tau}_{粘性力}.<br>$$<br>上述动量守恒方程为非守恒形式。将质量守恒方程代入动量守恒方程可得到守恒形式：<br>$$<br>\frac{\partial \rho \mathbf{u}}{\partial t}+\nabla \cdot(\rho \mathbf{u} \otimes\mathbf{u})=-\nabla p+\nabla \cdot \boldsymbol\tau.<br>$$<br>其中 $\otimes$ 表示矩阵乘法，可参考<a href="%E5%BC%A0%E9%87%8F%E8%BF%90%E7%AE%97">张量运算</a>。通常情况下所涉及的流体为不可压缩牛顿流体，则质量守恒方程简化为：<br>$$<br>\boxed{\nabla\cdot\mathbf{u}=0}.<br>$$<br>结合不可压缩牛顿流体的本构方程：<br>$$<br>\boldsymbol\tau=\mu\left(\nabla \mathbf{u}+\nabla \mathbf{u}^{\mathsf{T}}\right),<br>$$<br>动量方程可表示为：<br>$$<br>\frac{\partial \mathbf{u}}{\partial t}+\nabla\cdot(\mathbf{u}\otimes\mathbf{u})=-\nabla \frac{p}{\rho}+\frac{\mu}{\rho}\nabla\cdot\left(\nabla\mathbf{u}+\nabla \mathbf{u}^{\mathsf{T}}\right),<br>$$<br>其中 $\mu$ 为动力粘度（dynamic viscosity），$\mu/\rho$ 可用运动粘度（kinetic viscosity）$\nu$ 表示，则不可压缩牛顿流体动量方程常被写作：<br>$$<br>\boxed{\frac{\partial \mathbf{u}}{\partial t}+\nabla\cdot(\mathbf{u}\otimes\mathbf{u})=-\nabla \frac{p}{\rho}+\nu\nabla\cdot\left(\nabla\mathbf{u}+\nabla \mathbf{u}^{\mathsf{T}}\right)}.<br>$$</p>
+<h2 id="无量纲化"><a href="#无量纲化" class="headerlink" title="无量纲化"></a>无量纲化</h2><p>假设我们考察不可压缩牛顿流体，其特征长度为 $L$，特征时间为 $T$，特征速度为 $U$，特征压力为 $P$，则无量纲长度为 $x^*=x/L$，无量纲时间为 $t^*=t/T$，无量纲速度为 $\mathbf{u}^*=\mathbf{u}/U$，无量纲压力为 $p^*=p/P$，无量纲梯度为 $\nabla^*(\cdot)=\nabla(\cdot)\times L$。则质量守恒方程为：<br>$$<br>\frac{\nabla^*}{L}\cdot(\mathbf{u}^*U)=0.<br>$$</p>
+<p>即<br>$$<br>\boxed{\nabla^<em>\cdot\mathbf{u}^</em>=0}.<br>$$<br>动量守恒方程为：<br>$$<br>\frac{\partial (\mathbf{u}^* U)}{\partial (t^* T)}+\frac{\nabla^*}{L}\cdot((\mathbf{u}^* U)\otimes(\mathbf{u}^* U))=-\frac{\nabla^*}{L}\left(\frac{p^<em>P}{\rho}\right)+\nu\frac{\nabla^</em>}{L}\cdot<br>\left(\frac{\nabla^*}{L}(\mathbf{u}^* U+{\mathbf{u}^*}^{\mathsf{T}}U)\right),<br>$$<br>即<br>$$<br>\frac{U}{T}\frac{\partial \mathbf{u}^*}{\partial t^*}+\frac{U^2}{L}\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=-\frac{P}{\rho L}\nabla^<em>p^</em>+\nu\frac{U}{L^2}\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*+\nabla^*{\mathbf{u}^*}^{\mathsf{T}}),<br>$$<br>上述方程两边同时乘以 $L/U^2$ 得<br>$$<br>\boxed{\frac{L}{TU}\frac{\partial \mathbf{u}^*}{\partial t^*}+\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=-\frac{P}{\rho U^2}\nabla^<em>p^</em>+\frac{\nu}{UL}\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*+\nabla^*{\mathbf{u}^*}^{\mathsf{T}})},<br>$$<br>通过特征参数可以组合一系列无量纲参数：</p>
+<table>
+<thead>
+<tr>
+<th>无量纲数</th>
+<th>符号</th>
+<th>物理意义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>雷诺数</td>
+<td>$Re=\nu/(UL)$</td>
+<td>惯性力/粘性力</td>
+</tr>
+<tr>
+<td>斯特劳哈尔数</td>
+<td>$St=L/(TU)$</td>
+<td>局部加速/对流加速</td>
+</tr>
+<tr>
+<td>韦伯数</td>
+<td>$We=(\rho U^2L)/\sigma$</td>
+<td>惯性力/表面张力</td>
+</tr>
+</tbody></table>
+<p>通常我们选择 $L/(TU)\sim O(1)$ 和 $P/(\rho U^2) \sim O(1)$，则动量方程简化为：<br>$$<br>\boxed{\frac{\partial \mathbf{u}^*}{\partial t^*}+\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=-\nabla^<em>p^</em>+\frac{1}{Re}\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*+\nabla^*{\mathbf{u}^*}^{\mathsf{T}})}.<br>$$</p>
+<p>其中 $\nabla^<em>\cdot({\mathbf{u}^</em>}^{\mathsf{T}})\equiv0$，上式简化为：<br>$$<br>\boxed{\frac{\partial \mathbf{u}^*}{\partial t^*}+\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=-\nabla^<em>p^</em>+\frac{1}{Re}\nabla^<em>\cdot(\nabla^</em>\mathbf{u}^*)}.<br>$$</p>
+<h2 id="包含表面张力"><a href="#包含表面张力" class="headerlink" title="包含表面张力"></a>包含表面张力</h2><p>如果我们考虑由界面张力驱动的流动问题时，则需要在 NS 方程中增加表面张力项<br>$$<br>\Delta p =  \frac{\mathbf{F}_\sigma}{\text{d}s_1\text{d}s_2}=\sigma\left(\frac{1}{R_1}+\frac{1}{R_2}\right),<br>$$<br>其中 $R_1,R_2$ 为界面两个主轴曲率半径，采用 Continuum Surface Force （CSF）模型描述，表面张力项为<br>$$<br>\mathbf{F}_\sigma=\sigma \kappa \nabla \alpha,<br>$$<br>其中 $c$ 为体积分数，$\kappa$ 为曲率。则包含表面张力项的不可压缩牛顿流体动量方程为<br>$$<br>\boxed{\frac{\partial \mathbf{u}}{\partial t}+\nabla\cdot(\mathbf{u}\otimes\mathbf{u})=-\nabla \frac{p}{\rho}+\nu\nabla\cdot\left(\nabla\mathbf{u}\right)+\frac{\sigma}{\rho}\kappa\nabla c}.<br>$$<br>代入无量纲量得<br>$$<br>\frac{\partial (\mathbf{u}^* U)}{\partial (t^* T)}+\frac{\nabla^*}{L}\cdot((\mathbf{u}^* U)\otimes(\mathbf{u}^* U))=-\frac{\nabla^*}{L}\left(\frac{p^<em>P}{\rho}\right)+\nu\frac{\nabla^</em>}{L}\cdot<br>\left(\frac{\nabla^*}{L}(\mathbf{u}^* U)\right)+\frac{\sigma}{\rho} \frac{\kappa^*}{L}\frac{\nabla^*}{L} c,<br>$$<br>上述方程两边同时乘以 $L/U^2$ 得<br>$$<br>\boxed{\frac{L}{TU}\frac{\partial \mathbf{u}^*}{\partial t^*}+\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=-\frac{P}{\rho U^2}\nabla^<em>p^</em>+\frac{\nu}{UL}\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*)+\frac{\sigma}{\rho U^2L} \kappa^<em>\nabla^</em> c}\tag{1},<br>$$<br>选择 $L/(TU)\sim O(1)$ 和 $P/(\rho U^2) \sim O(1)$，则动量方程简化为：<br>$$<br>\boxed{\frac{\partial \mathbf{u}^*}{\partial t^*}+\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=-\nabla^<em>p^</em>+\frac{1}{Re}\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*)+\frac{1}{We} \kappa^<em>\nabla^</em> c}\tag{2}.<br>$$</p>
+<h2 id="Gerris-中动量方程"><a href="#Gerris-中动量方程" class="headerlink" title="Gerris 中动量方程"></a>Gerris 中动量方程</h2><p><a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/wiki/index.php/Main_Page">Gerris</a> 是一款用于精确求解不可压缩牛顿流体流动的偏微分方程求解器，该求解器求解的 <a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/wiki/index.php/FAQ#How_do_variables_defined_in_the_parameter_file_enter_the_equations_solved.3F">NS 方程</a>如下：<br>$$<br>\frac{\text{d} \mathbf{u}}{\text{d} t} = \alpha \left{ - \nabla p + \nabla \cdot ( \mu (\nabla \mathbf{u} + \nabla \mathbf{u}^\mathsf{T})) + \sigma \kappa \delta_s  \mathbf{n} \right} + \mathbf{F}_\text{source}(\mathbf{u}),<br>$$</p>
+<p>其中 $\alpha=1/\rho$，可通过命令<a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/wiki/index.php/GfsPhysicalParams"><code>GfsPhysicalParams</code></a>命令定义。$\sigma \kappa \delta_s  \mathbf{n}$ 为表面张力项，$\sigma$ 和 $\kappa$ 为表面张力系数和界面曲率，可分别通过<a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/wiki/index.php/GfsSourceTension"><code>GfsSourceTension</code></a>和<a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/wiki/index.php/GfsVariableCurvature"><code>GfsVariableCurvature</code></a>定义。动力粘度 $\mu$ 由<a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/wiki/index.php/GfsSourceViscosity"><code>GfsSourceViscosity</code></a>定义。尽管 Gerris 中动量方程与标准动量方程一样，似乎可以设定实际的物理参数如 $\mu,\sigma$ 来求解问题，但是这种尝试大部分情况下会求解错误。为了提高计算效率和计算精度，在 Gerris 中所有物理量建议进行无量纲化（实际上是必须的）。对比 Gerris 中动量方程和无量纲的动量方程 (1)，可以得出当动量方程 (1) 取<br>$$<br>\frac{L}{TU}=1,\ \frac{P}{\rho U^2}=\alpha,\ \frac{1}{Re}=\alpha\mu,\ \frac{1}{We}=\alpha\sigma<br>$$<br>时，两个方程就一致了。Gerris 中常常取<br>$$<br>\alpha = 1, \frac{1}{Re}=\mu,\ \frac{1}{We}=\sigma.<br>$$<br>这样 Gerris 中动量方程就与方程 (2) 一致了。这也是为什么 Gerris 中常常取雷诺数倒数和韦伯数倒数作为粘度和表面张力系数。</p>
+<h2 id="Gerris-中两相流体"><a href="#Gerris-中两相流体" class="headerlink" title="Gerris 中两相流体"></a>Gerris 中两相流体</h2><p>考虑两相流体，密度、粘度分别为 $\rho_1,\rho_2,\mu_1,\mu_2$，液体 1 为主液体，则密度相关参数 $\alpha$ 为<br>$$<br>\alpha = \frac{1}{c+(1-c)\times(\rho_2/\rho_1)}.<br>$$<br>若给定雷诺数 $Re=\rho_1 UL/\mu_1$，则粘度相关参数 $\mu$ 为<br>$$<br>\mu = \frac{1}{Re}\left(c+(1-c)\times(\mu_2/\mu_1)\right).<br>$$<br>若给定韦伯数 $We=\rho_1 U^2L/\sigma$，则表面张力相关参数 $\sigma$ 为<br>$$<br>\sigma = \frac{1}{We}.<br>$$</p>
+<h2 id="包含电场力"><a href="#包含电场力" class="headerlink" title="包含电场力"></a>包含电场力</h2><p>电流体流动问题还需要增加电场力<br>$$<br>F_\text{e}=\rho_e \mathbf{E}-\frac{1}{2}\mathbf{EE}\nabla\varepsilon,<br>$$<br>其中 $\varepsilon$ 为主液体介电常数，设特征电荷密度为 $\rho_\text{e0}$，特征场强为 $E_0$，特征介电常数为 $\varepsilon_1$，则电场力为<br>$$<br>F_\text{e}=\rho_\text{e0}E_0\cdot\rho_e^<em>\mathbf{E}^</em>-\frac{1}{2}E_0^2\mathbf{E^<em>E^</em>}\frac{\varepsilon}{L}\nabla^<em>\varepsilon^</em>,<br>$$<br>如果我们定义特征电荷密度可表示为<br>$$<br>\rho_\text{e0}=\frac{\varepsilon E_0}{L},<br>$$<br>则<br>$$<br>F_\text{e}=\frac{\varepsilon E_0^2}{L}\left(\rho_e^* \mathbf{E^*}-\frac{1}{2}\mathbf{E^<em>E^</em>}\nabla^<em>\varepsilon^</em>\right),<br>$$<br>再代入方程 (1) 可得<br>$$<br>\boxed{\begin{aligned}\frac{L}{TU}\frac{\partial \mathbf{u}^*}{\partial t^*}+\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=&amp;-\frac{P}{\rho U^2}\nabla^<em>p^</em>+\frac{\nu}{UL}\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*)<br>\<br>&amp;+\frac{\sigma}{\rho U^2L} \kappa^<em>\nabla^</em> c+\frac{\varepsilon E_0^2}{\rho U^2}\left(\rho_e^* \mathbf{E^*}-\frac{1}{2}\mathbf{E^<em>E^</em>}\nabla^<em>\varepsilon^</em>\right)\end{aligned}}\tag{3},<br>$$<br>方程 (3) 特别重要，相对于原始的 NS 方程，一是做了电荷密度的重定义（其他物理参数是直接选取一个值，而不是组合已有参数），二是两相流体假设密度可以先提取出来。</p>
+<p>如果选取特征时间<br>$$<br>T=\left(\frac{\rho L^3}{\gamma}\right)^{1/2},<br>$$<br>特征速度 $U=L/T$，特征压力<br>$$<br>P=\frac{\gamma}{L},<br>$$<br>则方程 (3) 可化简为<br>$$<br>\boxed{\begin{aligned}\frac{\partial \mathbf{u}^*}{\partial t^*}+\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=&amp;-\nabla^<em>p^</em>+Oh\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*)\<br>&amp;+\kappa^<em>\nabla^</em> c+Ca_\text{E}\left(\rho_e^* \mathbf{E^*}-\frac{1}{2}\mathbf{E^<em>E^</em>}\nabla^<em>\varepsilon^</em>\right)\end{aligned}},\tag{4}<br>$$<br>其中 $Oh,Ca_\text{E}$ 分别为奥内佐格数和电场毛系数，可表示为<br>$$<br>Oh=\frac{\mu}{\sqrt{\rho L \gamma}},\ Ca_\text{E}=\frac{\varepsilon L E^2}{\gamma}.<br>$$<br>方程 (4) 适用于电场下液滴行为研究。</p>
+<p>如果选取特征速度<br>$$<br>U = \frac{\varepsilon L E_0^2}{\mu},<br>$$<br>特征压力<br>$$<br>P=\varepsilon E_0^2,<br>$$<br>特征时间 $T=\tau_\text{P}$，则方程 (3) 可简化为<br>$$<br>\boxed{\begin{aligned}<br>\frac{\tau_\mu}{\tau_\text{P}}\frac{\partial \mathbf{u}^*}{\partial t^*}+Re\nabla^<em>\cdot(\mathbf{u}^</em>\otimes\mathbf{u}^*)=&amp;-\nabla^<em>p^</em>+\nabla^<em>\cdot<br>(\nabla^</em>\mathbf{u}^*)\<br>&amp;+\frac{Re}{We}\kappa^<em>\nabla^</em> c+(\rho_e^* \mathbf{E^*}-\frac{1}{2}\mathbf{E^<em>E^</em>}\nabla^<em>\varepsilon^</em>)<br>\end{aligned}},\tag{5}<br>$$<br>其中 $\tau_\mu$ 是粘性弛豫时间，可表示为<br>$$<br>\tau_\mu = \frac{\rho L^2}{\mu}.<br>$$</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Chilton
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://nchilton.github.io/2019/11/08/How-to-nondimensionalize-NS-equations/" title="NS 方程的无量纲化">https://nchilton.github.io/2019/11/08/How-to-nondimensionalize-NS-equations/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Gerris/" rel="tag"><i class="fa fa-tag"></i> Gerris</a>
+              <a href="/tags/Navier-Stokes-equations/" rel="tag"><i class="fa fa-tag"></i> Navier-Stokes equations</a>
+              <a href="/tags/Fluid-dynamics/" rel="tag"><i class="fa fa-tag"></i> Fluid dynamics</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/04/OOE.English.Writing.02/" rel="prev" title="How to write an email in English">
+      <i class="fa fa-chevron-left"></i> How to write an email in English
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/09/Lagrangian.and.Eulerian.Description/" rel="next" title="Methods of describing fluid motion">
+      Methods of describing fluid motion <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NS-%E6%96%B9%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">NS 方程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E9%87%8F%E7%BA%B2%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">无量纲化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%85%E5%90%AB%E8%A1%A8%E9%9D%A2%E5%BC%A0%E5%8A%9B"><span class="nav-number">3.</span> <span class="nav-text">包含表面张力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gerris-%E4%B8%AD%E5%8A%A8%E9%87%8F%E6%96%B9%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">Gerris 中动量方程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gerris-%E4%B8%AD%E4%B8%A4%E7%9B%B8%E6%B5%81%E4%BD%93"><span class="nav-number">5.</span> <span class="nav-text">Gerris 中两相流体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%85%E5%90%AB%E7%94%B5%E5%9C%BA%E5%8A%9B"><span class="nav-number">6.</span> <span class="nav-text">包含电场力</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Chilton"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Chilton</p>
+  <div class="site-description" itemprop="description">好好学习，天天向上</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/NChilton" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;NChilton" rel="noopener" target="_blank">GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/chilton-nieh" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;chilton-nieh" rel="noopener" target="_blank">Zhihu</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chilton</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

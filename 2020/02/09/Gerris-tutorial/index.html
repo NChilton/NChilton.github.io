@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"nchilton.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Gerris 是一款用于求解流体流动的软件包，能够准确描述两相流界面形变。其源码采用 C 语言编译，因此 Gerris 脚本可以内嵌标准的 C 语言函数。本文介绍如何写一个简单的 Gerris 脚本，原文请见此。注意，请确保你已经安装了 Gerris，安装教程可参考我的之前博客。由于 Gerris 在类 Unix 平台下运行，因此你需要熟悉类 Unix 的基本命令。    一个简单的脚本文件Ge">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gerris 入门教程">
+<meta property="og:url" content="https://nchilton.github.io/2020/02/09/Gerris-tutorial/index.html">
+<meta property="og:site_name" content="李杜醉酒">
+<meta property="og:description" content="Gerris 是一款用于求解流体流动的软件包，能够准确描述两相流界面形变。其源码采用 C 语言编译，因此 Gerris 脚本可以内嵌标准的 C 语言函数。本文介绍如何写一个简单的 Gerris 脚本，原文请见此。注意，请确保你已经安装了 Gerris，安装教程可参考我的之前博客。由于 Gerris 在类 Unix 平台下运行，因此你需要熟悉类 Unix 的基本命令。    一个简单的脚本文件Ge">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://nchilton.github.io/2020/02/09/Gerris-tutorial/Gerris-tutorial/vorticity.gif">
+<meta property="og:image" content="https://nchilton.github.io/2020/02/09/Gerris-tutorial/Gerris-tutorial/box.png">
+<meta property="og:image" content="https://nchilton.github.io/2020/02/09/Gerris-tutorial/Gerris-tutorial/mesh.png">
+<meta property="og:image" content="https://nchilton.github.io/2020/02/09/Gerris-tutorial/Gerris-tutorial/output.png">
+<meta property="article:published_time" content="2020-02-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-02-18T16:00:00.000Z">
+<meta property="article:author" content="Chilton">
+<meta property="article:tag" content="Gerris">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://nchilton.github.io/2020/02/09/Gerris-tutorial/Gerris-tutorial/vorticity.gif">
+
+<link rel="canonical" href="https://nchilton.github.io/2020/02/09/Gerris-tutorial/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Gerris 入门教程 | 李杜醉酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">李杜醉酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">博客</p>
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">32</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">33</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://nchilton.github.io/2020/02/09/Gerris-tutorial/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chilton">
+      <meta itemprop="description" content="好好学习，天天向上">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李杜醉酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Gerris 入门教程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-09 00:00:00" itemprop="dateCreated datePublished" datetime="2020-02-09T00:00:00+08:00">2020-02-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-19 00:00:00" itemprop="dateModified" datetime="2020-02-19T00:00:00+08:00">2020-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tutorial/" itemprop="url" rel="index">
+                    <span itemprop="name">Tutorial</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Gerris 是一款用于求解流体流动的软件包，能够准确描述两相流界面形变。其源码采用 C 语言编译，因此 Gerris 脚本可以内嵌标准的 C 语言函数。本文介绍如何写一个简单的 Gerris 脚本，原文请见<a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/tutorial/tutorial/tutorial1.html">此</a>。注意，请确保你已经安装了 Gerris，安装教程可参考我的之前博客。由于 Gerris 在类 Unix 平台下运行，因此你需要熟悉类 Unix 的基本命令。</p>
+</blockquote>
+<!---more--->
+
+<h2 id="一个简单的脚本文件"><a href="#一个简单的脚本文件" class="headerlink" title="一个简单的脚本文件"></a>一个简单的脚本文件</h2><p>Gerris 输入脚本由<strong>模拟域</strong>，<strong>网格划分与初始条件</strong>，<strong>边界条件</strong>，<strong>固体边界</strong>，<strong>输出内容</strong>和<strong>控制参数与数值算法</strong>几部分组成。注意，Gerris 中求解的是<a href="%E6%97%A0%E9%87%8F%E7%BA%B2"><strong>无量纲化NS 方程</strong></a>，所有物理量都是无量纲的，默认粘度、表面张力等量为 0。</p>
+<p>以下以一个初始<strong>随机涡量</strong>的例子说明 Gerris 脚本。在命令窗口输入以下命令新建<code>vorticity.gfs</code>脚本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir vorticity</span><br><span class="line">cd vorticity</span><br><span class="line">vi vorticity.gfs</span><br></pre></td></tr></table></figure>
+
+<p>粘贴以下内容</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 模拟区域</span></span><br><span class="line"><span class="number">1</span> <span class="number">2</span> GfsSimulation GfsBox GfsGEdge &#123;&#125; &#123;</span><br><span class="line"><span class="comment"># 模拟时间</span></span><br><span class="line">  GfsTime &#123; end = <span class="number">50</span> &#125;</span><br><span class="line"><span class="comment"># 网格划分</span></span><br><span class="line">  GfsRefine <span class="number">6</span></span><br><span class="line"><span class="comment"># 初始条件</span></span><br><span class="line">  GfsInit &#123;&#125; &#123;</span><br><span class="line">    U = (<span class="number">0.5</span> - rand()/(double)RAND_MAX)</span><br><span class="line">    V = (<span class="number">0.5</span> - rand()/(double)RAND_MAX)</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment"># 输出信息，打印在命令窗口</span></span><br><span class="line">  GfsOutputTime            &#123; istep = <span class="number">10</span>   &#125; stdout</span><br><span class="line">  GfsOutputProjectionStats &#123; istep = <span class="number">10</span>   &#125; stdout</span><br><span class="line">  GfsOutputScalarStats     &#123; istep = <span class="number">10</span>   &#125; stdout &#123; v = Vorticity &#125;</span><br><span class="line"><span class="comment"># 输出信息，写入文件</span></span><br><span class="line">  GfsOutputPPM             &#123; step = <span class="number">0.1</span> &#125; &#123; ppm2gif &gt; vorticity.gif &#125; &#123;</span><br><span class="line">    v = Vorticity </span><br><span class="line">    <span class="built_in">min</span> = -<span class="number">10</span></span><br><span class="line">    <span class="built_in">max</span> =  <span class="number">10</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 边界条件</span></span><br><span class="line">GfsBox &#123;&#125;</span><br><span class="line"><span class="number">1</span> <span class="number">1</span> right</span><br><span class="line"><span class="number">1</span> <span class="number">1</span> top</span><br></pre></td></tr></table></figure>
+
+<p>在命令窗口输入以下以进行运算：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gerris2D vorticity.gfs</span><br></pre></td></tr></table></figure>
+
+<p>运行完后会生成<code>vorticity.gif</code>文件，如下所示：</p>
+<p><img src="Gerris-tutorial/vorticity.gif"></p>
+<h2 id="模拟域"><a href="#模拟域" class="headerlink" title="模拟域"></a>模拟域</h2><p><code>vorticity.gfs</code>第 1 行<code>1 2 GfsSimulation GfsBox GfsGEdge &#123;&#125; &#123;&#125;</code>由 7 个块组成，定义了模拟域的布局。</p>
+<ul>
+<li>第 1 个块：定义节点（node）数，如第 1 行中的<code>1</code></li>
+<li>第 2 个块：定义连接节点的边（edge）数，如第 1 行中<code>2</code></li>
+<li>第 3 个块：定义模拟对象类型，如第 1 行中<code>GfsSimulation</code></li>
+<li>第 4 个块：定义节点的默认对象类型，如第 1 行中<code>GfsBox</code></li>
+<li>第 5 个块：定义边的对象类型，如第 1 行中的<code>GfsEdge</code></li>
+<li>第 6 个块：第 1 个可选参数，如第 1 行中的前一个大括号</li>
+<li>第 7 个块：第 2 个可选参数，如第 1 行中的后一个大括号</li>
+</ul>
+<p>因此该行定义了一个模拟盒子（box），模拟盒子有 2 条边存在连接。</p>
+<h2 id="边界条件"><a href="#边界条件" class="headerlink" title="边界条件"></a>边界条件</h2><p>模拟盒子有 2 条边存在连接情况由最后三行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GfsBox &#123;&#125;</span><br><span class="line"><span class="number">1</span> <span class="number">1</span> right</span><br><span class="line"><span class="number">1</span> <span class="number">1</span> top</span><br></pre></td></tr></table></figure>
+
+<p>定义。模拟盒子的右边（right）和上边（top）与自己相连，这相当于定义了<strong>周期性边界条件</strong>。Gerris 中盒子方向如下定义，默认情况下，二维为正方形，三维为正方体。<code>GfsSimulation</code>以<code>1</code>号盒子的中心为坐标原点，<code>GfsAxi</code>以<code>1</code>号盒子 bottom 边中心为坐标原点。</p>
+<p><img src="Gerris-tutorial/box.png"></p>
+<p>这个例子采用周期性边界条件，并没有指定如速度入口等边界条件。</p>
+<h2 id="网格划分与初始条件"><a href="#网格划分与初始条件" class="headerlink" title="网格划分与初始条件"></a>网格划分与初始条件</h2><p><code>vorticity.gfs</code>第 3 行<code>GfsRefine 6 </code>定义了网格划分，<code>6</code>表示网格细分级别，模拟盒子被划分为 $2^6\times2^6$ 个网格。我们也可以采用<code>GfsRefine 6.*(1. - sqrt (x*x + y*y))</code>定义一个变细分级别的网格。</p>
+<p><img src="Gerris-tutorial/mesh.png"></p>
+<p>第 4-6 行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GfsInit &#123;&#125; &#123;</span><br><span class="line">  U = (<span class="number">0.5</span> - rand()/(double)RAND_MAX)</span><br><span class="line">  V = (<span class="number">0.5</span> - rand()/(double)RAND_MAX)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>定义初始速度条件，其它量如压力等默认情况下都为 0。<code>rand()</code>为 C 语言标准随机函数。</p>
+<h2 id="输出内容"><a href="#输出内容" class="headerlink" title="输出内容"></a>输出内容</h2><p> <code>vorticity.gfs</code>第 8-15 行 均为输出内容，其中第 8-10 行为在命令窗口上打印内容，</p>
+<p><img src="Gerris-tutorial/output.png"></p>
+<p>第 11-15 行为写入模拟结果到<code>vorticity.gif</code>，其中 PPM 为一种图像格式，可用 ACDSee 软件打开。考虑到后期处理，建议输出<code>vtk</code>格式或<code>plt</code>格式，具体可参考<code>GfsOutputSimulation</code><a target="_blank" rel="noopener" href="http://gfs.sourceforge.net/wiki/index.php/GfsOutputSimulation">命令</a>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">GfsOutputSimulation &#123; step = <span class="number">1</span> &#125; name.vtk &#123;</span><br><span class="line"><span class="built_in">format</span> = VTK</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 或者</span></span><br><span class="line">GfsOutputSimulation &#123; step = <span class="number">1</span> &#125; name.plt &#123;</span><br><span class="line"><span class="built_in">format</span> = Tecplot</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Chilton
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://nchilton.github.io/2020/02/09/Gerris-tutorial/" title="Gerris 入门教程">https://nchilton.github.io/2020/02/09/Gerris-tutorial/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Gerris/" rel="tag"><i class="fa fa-tag"></i> Gerris</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/19/Tensor-operation/" rel="prev" title="张量运算">
+      <i class="fa fa-chevron-left"></i> 张量运算
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E8%84%9A%E6%9C%AC%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">一个简单的脚本文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E5%9F%9F"><span class="nav-number">2.</span> <span class="nav-text">模拟域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%B9%E7%95%8C%E6%9D%A1%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">边界条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E5%88%92%E5%88%86%E4%B8%8E%E5%88%9D%E5%A7%8B%E6%9D%A1%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">网格划分与初始条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E5%86%85%E5%AE%B9"><span class="nav-number">5.</span> <span class="nav-text">输出内容</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Chilton"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Chilton</p>
+  <div class="site-description" itemprop="description">好好学习，天天向上</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/NChilton" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;NChilton" rel="noopener" target="_blank">GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/chilton-nieh" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;chilton-nieh" rel="noopener" target="_blank">Zhihu</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chilton</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

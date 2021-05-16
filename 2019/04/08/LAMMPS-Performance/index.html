@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"nchilton.github.io","root":"/","scheme":"Gemini","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="加速 LAMMPS 运行性能见 Speed。    CPU 信息首先让我们了解 CPU 的几个概念：  物理 CPU 个数：插槽上的 CPU 个数 CPU 核数：每个物理 CPU 中 core 的个数 逻辑 CPU 个数：物理 CPU 个数 × 每颗物理 CPU 的核数 × 超线程数  如果逻辑 CPU 个数 &#x3D; 物理 CPU 个数 × 每颗物理 CPU 的核数，则表示处理器不支持超线程。 在 L">
+<meta property="og:type" content="article">
+<meta property="og:title" content="加速 LAMMPS 运行效率">
+<meta property="og:url" content="https://nchilton.github.io/2019/04/08/LAMMPS-Performance/index.html">
+<meta property="og:site_name" content="李杜醉酒">
+<meta property="og:description" content="加速 LAMMPS 运行性能见 Speed。    CPU 信息首先让我们了解 CPU 的几个概念：  物理 CPU 个数：插槽上的 CPU 个数 CPU 核数：每个物理 CPU 中 core 的个数 逻辑 CPU 个数：物理 CPU 个数 × 每颗物理 CPU 的核数 × 超线程数  如果逻辑 CPU 个数 &#x3D; 物理 CPU 个数 × 每颗物理 CPU 的核数，则表示处理器不支持超线程。 在 L">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://nchilton.github.io/2019/04/08/LAMMPS-Performance/LAMMPS-Performance/Task.PNG">
+<meta property="og:image" content="https://nchilton.github.io/2019/04/08/LAMMPS-Performance/LAMMPS-Performance/Windows-CPU.png">
+<meta property="article:published_time" content="2019-04-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-03-12T16:00:00.000Z">
+<meta property="article:author" content="Chilton">
+<meta property="article:tag" content="LAMMPS">
+<meta property="article:tag" content="Matlab">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://nchilton.github.io/2019/04/08/LAMMPS-Performance/LAMMPS-Performance/Task.PNG">
+
+<link rel="canonical" href="https://nchilton.github.io/2019/04/08/LAMMPS-Performance/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>加速 LAMMPS 运行效率 | 李杜醉酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">李杜醉酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">博客</p>
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">32</span></a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">33</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://nchilton.github.io/2019/04/08/LAMMPS-Performance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chilton">
+      <meta itemprop="description" content="好好学习，天天向上">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="李杜醉酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          加速 LAMMPS 运行效率
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-08 00:00:00" itemprop="dateCreated datePublished" datetime="2019-04-08T00:00:00+08:00">2019-04-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-13 00:00:00" itemprop="dateModified" datetime="2019-03-13T00:00:00+08:00">2019-03-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tutorial/" itemprop="url" rel="index">
+                    <span itemprop="name">Tutorial</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>加速 LAMMPS 运行性能见 <a target="_blank" rel="noopener" href="https://lammps.sandia.gov/doc/Speed.html">Speed</a>。</p>
+<p><img src="LAMMPS-Performance/Task.PNG" alt="Windows 下任务管理器"></p>
+<!---more--->
+
+<h2 id="CPU-信息"><a href="#CPU-信息" class="headerlink" title="CPU 信息"></a>CPU 信息</h2><p>首先让我们了解 CPU 的几个概念：</p>
+<ul>
+<li><strong>物理 CPU 个数</strong>：插槽上的 CPU 个数</li>
+<li><strong>CPU 核数</strong>：每个物理 CPU 中 core 的个数</li>
+<li><strong>逻辑 CPU 个数</strong>：物理 CPU 个数 × 每颗物理 CPU 的核数 × 超线程数</li>
+</ul>
+<p>如果<strong>逻辑 CPU 个数</strong> = 物理 CPU 个数 × 每颗物理 CPU 的核数，则表示处理器不支持超线程。</p>
+<p>在 Linux 查看<strong>物理 CPU 个数</strong> 、<strong>CPU 核数</strong>和<strong>逻辑 CPU 个数</strong>如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/cpuinfo| grep <span class="string">&quot;physical id&quot;</span>| sort| uniq| wc -l <span class="comment"># 物理 CPU 个数</span></span><br><span class="line">cat /proc/cpuinfo| grep <span class="string">&quot;cpu cores&quot;</span>| uniq <span class="comment"># CPU 核数</span></span><br><span class="line">cat /proc/cpuinfo| grep <span class="string">&quot;processor&quot;</span>| wc -l <span class="comment"># 逻辑 CPU 个数</span></span><br></pre></td></tr></table></figure>
+
+<p>在 Windows 下打开<code>任务管理器&gt;性能</code>即可查看 CPU 信息</p>
+<p> <img src="LAMMPS-Performance/Windows-CPU.png" alt="Windows CPU"></p>
+<p>当然在 Windows 下也可以通过命令行查看 CPU 信息，如下：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wmic </span><br><span class="line">cpu get * </span><br></pre></td></tr></table></figure>
+
+<p>先输入<code>wmic</code>，出现<code>wmic:root\cli&gt;</code>，在<code>&gt;</code>后输入<code>cpu get *</code>，输出信息每一行表示一个物理 CPU 信息。NumberOfCores 表示每个物理 CPU 中 core 的个数，NumberOfLogicalProcessors 表示每个物理 CPU 中逻辑 CPU 个数。</p>
+<h2 id="评测-CPU-核心运行-LAMMPS-效率"><a href="#评测-CPU-核心运行-LAMMPS-效率" class="headerlink" title="评测 CPU 核心运行 LAMMPS 效率"></a>评测 CPU 核心运行 LAMMPS 效率</h2><p>在模拟之前通常需要运行比较小的时间步来估算模拟时长，如模拟体系在 1 个或多个线程上运行 100-1000 步，计算其运行时间，进而估计完全模拟完的时间。该种测试建议模拟体系处于平衡态。</p>
+<p>在一个（或多个线程）上运行应该可以很好地估计串行性能以及时间步长的哪些部分花费的时间最多。在几个不同的处理器计数上运行相同的问题应该给出并行可伸缩性的估计。即如果模拟在16个处理器上运行速度快16倍，则其100％并行效率;如果它在16个处理器上运行速度提高了8倍，那么它的效率将提高50％。</p>
+<p>时序信息中最重要的数据是时序细分和相对百分比。例如，如果只消耗10％的运行时间，尝试使用不同的选项来加速远程求解器几乎没有什么影响。如果成对时间占主导地位，您可能需要查看对样式的GPU或OMP版本，如下所述。比较在增加处理器数量时百分比如何变化，可以让您了解时间步长内不同的操作是如何缩放的。请注意，如果您使用Kspace求解器运行，则Kspace时间的细分会有额外的输出。对于PPPM，这包括在FFT上花费的分数，这可能是通信密集型的。</p>
+<p>时序信息中的另一个重要细节是原子计数和邻居计数的直方图。如果处理器之间的差异很大，则会出现负载不平衡问题。这通常会导致相对定时数据不准确，因为处理器必须等待其他处理器进行通信才能赶上。因此，由于负载不平衡，“通信”或“其他”的报告时间可能比实际高。如果这是一个问题，您可以取消注释src / timer.cpp中的MPI_Barrier（）行，并重新编译LAMMPS，以获得同步时序。</p>
+<h3 id="效率评测"><a href="#效率评测" class="headerlink" title="效率评测"></a>效率评测</h3><p>以下测试几种状况下的运行效率，以<strong>计算时间/线程程数</strong>作为比较</p>
+<ul>
+<li>串行<code>lmp_serial -in test.in</code></li>
+<li>8 线程并行<code>mpiexec -np 8 lmp_mpi -in test.in</code></li>
+<li>16 线程并行<code>mpiexec -np 16 lmp_mpi -in test.in</code></li>
+<li>32 线程并行<code>mpiexec -np 32 lmp_mpi -in test.in</code></li>
+<li>14 线程并行<code>mpiexec -np 14 lmp_mpi -in test.in</code></li>
+<li>28 线程并行<code>mpiexec -np 28 lmp_mpi -in test.in</code></li>
+<li></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Chilton
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://nchilton.github.io/2019/04/08/LAMMPS-Performance/" title="加速 LAMMPS 运行效率">https://nchilton.github.io/2019/04/08/LAMMPS-Performance/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/LAMMPS/" rel="tag"><i class="fa fa-tag"></i> LAMMPS</a>
+              <a href="/tags/Matlab/" rel="tag"><i class="fa fa-tag"></i> Matlab</a>
+              <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/07/GA/" rel="prev" title="遗传算法">
+      <i class="fa fa-chevron-left"></i> 遗传算法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/04/12/Taylor.G.I/" rel="next" title="杰弗里·泰勒">
+      杰弗里·泰勒 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E4%BF%A1%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">CPU 信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E6%B5%8B-CPU-%E6%A0%B8%E5%BF%83%E8%BF%90%E8%A1%8C-LAMMPS-%E6%95%88%E7%8E%87"><span class="nav-number">2.</span> <span class="nav-text">评测 CPU 核心运行 LAMMPS 效率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%88%E7%8E%87%E8%AF%84%E6%B5%8B"><span class="nav-number">2.1.</span> <span class="nav-text">效率评测</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Chilton"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Chilton</p>
+  <div class="site-description" itemprop="description">好好学习，天天向上</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/NChilton" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;NChilton" rel="noopener" target="_blank">GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/chilton-nieh" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;chilton-nieh" rel="noopener" target="_blank">Zhihu</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chilton</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
