@@ -356,22 +356,17 @@
 
       
           <blockquote>
-<p>在N-S方程中，常常会涉及<strong>标量</strong>，<strong>向量</strong>，<strong>张量</strong>。比如压力$p$为标量，速度$\mathbf{u}$为向量，剪切应力$\boldsymbol{\tau}$为张量。考虑三维体系，则标量为$1\times1$的零维矩阵，向量为$3\times1$的一维矩阵，二维张量为$3\times3$的二维矩阵。张量运算涉及梯度运算和散度运算，当然还有旋度计算，此处只讨论梯度运算和散度运算。</p>
+<p>在N-S方程中，常常会涉及<strong>标量</strong>，<strong>向量</strong>，<strong>张量</strong>。比如压力$p$为标量，速度$\mathbf{u}$为向量，剪切应力$\boldsymbol{\tau}$为张量。考虑三维体系，则标量为$1\times1$的零维矩阵，向量为$3\times1$的一维矩阵，二维张量为$3\times3$的二维矩阵。张量运算涉及梯度运算和散度运算，当然还有旋度计算。</p>
 </blockquote>
 <p><img src="https://pic4.zhimg.com/v2-5d7bd5457765e71f540c0f0c79f3c386_1440w.jpg" alt="梯度、散度、旋度等关系"></p>
-<!---more--->
-
-<h2 id="梯度与散度运算"><a href="#梯度与散度运算" class="headerlink" title="梯度与散度运算"></a>梯度与散度运算</h2><p>梯度运算和散度运算可分别用 $\text{grad}(\cdot)=\nabla(\cdot)$ 和 $\text{div}(\cdot)=\nabla\cdot(\cdot)$ 表示。梯度运算相当于升维，散度运算相当于升维降维。比如压力进行梯度运算为：<br>$$<br>\nabla p=\left(\frac{\partial p}{\partial x},\frac{\partial p}{\partial y},\frac{\partial p}{\partial z}\right)^\mathsf{T}.<br>$$<br>由标量升维至向量。对速度 $\mathbf{u}=(u,v,w)^\mathsf{T}$ 进行散度运算为：<br>$$<br>\nabla\cdot\mathbf{u}=\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}+\frac{\partial w}{\partial z}.<br>$$<br>由向量降维值标量。这里梯度运算符 $\nabla$ 相当于一个向量<br>$$<br>\nabla(\cdot)=\left(\frac{\partial (\cdot)}{\partial x},\frac{\partial (\cdot)}{\partial y},\frac{\partial (\cdot)}{\partial z}\right)^\mathsf{T}.<br>$$</p>
-<p>$\nabla p$ 相当于向量与标量相乘，$\nabla\cdot\mathbf{u}$ 相当于向量与向量作点乘（内积）。因此对向量作梯度运算相当于对向量每一个分量作梯度运算，即</p>
-<p>$$<br>\nabla \mathbf{u}=\left(\nabla u,\nabla v,\nabla w\right)=\begin{pmatrix} \frac{\partial u}{\partial x} &amp; \frac{\partial v}{\partial x} &amp; \frac{\partial w}{\partial x} \ \frac{\partial u}{\partial y} &amp; \frac{\partial v}{\partial y} &amp; \frac{\partial w}{\partial y} \ \frac{\partial u}{\partial z} &amp; \frac{\partial v}{\partial z} &amp; \frac{\partial w}{\partial z} \end{pmatrix}.<br>$$</p>
-<p>由向量升维至张量。同理，对张量作散度运算，相当于张量中每一个列向量分作散度运算，即<br>$$<br>\nabla\cdot(\nabla\mathbf{u})=\left(\nabla\cdot\begin{pmatrix}\frac{\partial u}{\partial x} \ \frac{\partial u}{\partial y} \ \frac{\partial u}{\partial z}  \end{pmatrix},\nabla\cdot\begin{pmatrix}\frac{\partial v}{\partial x} \ \frac{\partial v}{\partial y} \ \frac{\partial v}{\partial z}  \end{pmatrix},\nabla\cdot\begin{pmatrix}\frac{\partial w}{\partial x} \ \frac{\partial w}{\partial y} \ \frac{\partial w}{\partial z}  \end{pmatrix}\right)^\mathsf{T}=\begin{pmatrix}<br>      \frac{\partial}{\partial x}\left(\frac{\partial u}{\partial x}\right)+\frac{\partial}{\partial y}\left(\frac{\partial u}{\partial y}\right)+\frac{\partial}{\partial z}\left(\frac{\partial u}{\partial z}\right)\<br>      \frac{\partial}{\partial x}\left(\frac{\partial v}{\partial x}\right)+\frac{\partial}{\partial y}\left(\frac{\partial v}{\partial y}\right)+\frac{\partial}{\partial z}\left(\frac{\partial v}{\partial z}\right)\<br>      \frac{\partial}{\partial x}\left(\frac{\partial w}{\partial x}\right)+\frac{\partial}{\partial y}\left(\frac{\partial w}{\partial y}\right)+\frac{\partial}{\partial z}\left(\frac{\partial w}{\partial z}\right)\<br>    \end{pmatrix}.<br>$$</p>
-<p>由张量降维至向量。</p>
-<h2 id="矩阵运算"><a href="#矩阵运算" class="headerlink" title="矩阵运算"></a>矩阵运算</h2><ul>
-<li>内积</li>
-<li>外积</li>
-<li>矩阵乘法</li>
-</ul>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/19/Tensor-operation/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
