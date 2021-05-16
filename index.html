@@ -115,7 +115,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">32</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">31</span></a>
 
   </li>
         <li class="menu-item menu-item-tags">
@@ -356,8 +356,9 @@
 
       
           <blockquote>
-<p>在 N-S 方程中，常常会涉及<strong>标量</strong>，<strong>向量</strong>，<strong>张量</strong>。比如压力 $p$ 为标量，速度 $\mathbf{u}$ 为向量，剪切应力 $\boldsymbol{\tau}$ 为张量。考虑三维体系，则标量为 $1\times1$ 的 0 维矩阵，向量为 $3\times1$ 的 1 维矩阵，二维张量为 $3\times3$ 的 2 维矩阵。张量运算涉及梯度运算和散度运算，当然还有旋度计算，此处只讨论梯度运算和散度运算，详细运算可见<a target="_blank" rel="noopener" href="http://dyfluid.com/docs/tensor.html">此</a>。</p>
+<p>在N-S方程中，常常会涉及<strong>标量</strong>，<strong>向量</strong>，<strong>张量</strong>。比如压力$p$为标量，速度$\mathbf{u}$为向量，剪切应力$\boldsymbol{\tau}$为张量。考虑三维体系，则标量为$1\times1$的零维矩阵，向量为$3\times1$的一维矩阵，二维张量为$3\times3$的二维矩阵。张量运算涉及梯度运算和散度运算，当然还有旋度计算，此处只讨论梯度运算和散度运算。</p>
 </blockquote>
+<p><img src="https://pic4.zhimg.com/v2-5d7bd5457765e71f540c0f0c79f3c386_1440w.jpg" alt="梯度、散度、旋度等关系"></p>
 <!---more--->
 
 <h2 id="梯度与散度运算"><a href="#梯度与散度运算" class="headerlink" title="梯度与散度运算"></a>梯度与散度运算</h2><p>梯度运算和散度运算可分别用 $\text{grad}(\cdot)=\nabla(\cdot)$ 和 $\text{div}(\cdot)=\nabla\cdot(\cdot)$ 表示。梯度运算相当于升维，散度运算相当于升维降维。比如压力进行梯度运算为：<br>$$<br>\nabla p=\left(\frac{\partial p}{\partial x},\frac{\partial p}{\partial y},\frac{\partial p}{\partial z}\right)^\mathsf{T}.<br>$$<br>由标量升维至向量。对速度 $\mathbf{u}=(u,v,w)^\mathsf{T}$ 进行散度运算为：<br>$$<br>\nabla\cdot\mathbf{u}=\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}+\frac{\partial w}{\partial z}.<br>$$<br>由向量降维值标量。这里梯度运算符 $\nabla$ 相当于一个向量<br>$$<br>\nabla(\cdot)=\left(\frac{\partial (\cdot)}{\partial x},\frac{\partial (\cdot)}{\partial y},\frac{\partial (\cdot)}{\partial z}\right)^\mathsf{T}.<br>$$</p>
